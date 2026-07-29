@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,8 +21,10 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png",
-      "output": "single"
+      "favicon": "./assets/favicon.png"
+    },
+    "experiments": {
+      "baseUrl": "/app-organizacion"
     }
   }
 }
