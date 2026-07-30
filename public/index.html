@@ -7,13 +7,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* TEMAS DE COLORES */
     :root {
+      /* Tema por defecto: Oscuro Neón */
       --bg: #0f172a;
       --card-bg: #1e293b;
       --card-hover: #334155;
       --border: #334155;
       --text: #f8fafc;
       --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
       
       /* Categorías */
       --cat-trabajo: #38bdf8;
@@ -21,10 +25,41 @@
       --cat-proyectos: #c084fc;
       --cat-prog: #34d399;
       
-      --accent: #6366f1;
-      --accent-hover: #4f46e5;
       --danger: #f43f5e;
       --radius: 16px;
+    }
+
+    [data-theme="emerald"] {
+      --bg: #064e3b;
+      --card-bg: #065f46;
+      --card-hover: #047857;
+      --border: #047857;
+      --text: #ecfdf5;
+      --text-muted: #a7f3d0;
+      --accent: #10b981;
+      --accent-hover: #059669;
+    }
+
+    [data-theme="violet"] {
+      --bg: #1e1b4b;
+      --card-bg: #2e1065;
+      --card-hover: #3b0764;
+      --border: #4c1d95;
+      --text: #faf5ff;
+      --text-muted: #c084fc;
+      --accent: #a855f7;
+      --accent-hover: #9333ea;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-hover: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,6 +73,7 @@
       justify-content: center;
       padding: 20px 16px 60px;
       -webkit-font-smoothing: antialiased;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .app-container {
@@ -48,12 +84,14 @@
       gap: 20px;
     }
 
-    /* HEADER & DASHBOARD */
+    /* HEADER & PALETA DE COLORES */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 0;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .title-area h1 {
@@ -68,6 +106,34 @@
       margin-top: 2px;
     }
 
+    .theme-picker {
+      display: flex;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 99px;
+      align-items: center;
+    }
+
+    .theme-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .theme-dot:hover { transform: scale(1.15); }
+    .theme-dot.active { border-color: var(--text); transform: scale(1.15); }
+
+    .dot-default { background: linear-gradient(135deg, #0f172a, #6366f1); }
+    .dot-emerald { background: linear-gradient(135deg, #064e3b, #10b981); }
+    .dot-violet { background: linear-gradient(135deg, #1e1b4b, #a855f7); }
+    .dot-light { background: linear-gradient(135deg, #ffffff, #2563eb); border: 1px solid #cbd5e1; }
+
+    /* DASHBOARD */
     .dashboard-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -76,7 +142,8 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+      transition: background-color 0.3s, border-color 0.3s;
     }
 
     .dash-metrics {
@@ -106,7 +173,7 @@
     .progress-bar-bg {
       height: 10px;
       width: 100%;
-      background-color: #0f172a;
+      background-color: var(--bg);
       border-radius: 99px;
       overflow: hidden;
     }
@@ -114,9 +181,9 @@
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #6366f1, #34d399);
+      background: var(--accent);
       border-radius: 99px;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
     }
 
     /* CONTROLES Y FILTROS */
@@ -166,7 +233,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.2s, transform 0.1s;
+      transition: background-color 0.2s, transform 0.1s;
     }
 
     .add-btn:hover { background: var(--accent-hover); }
@@ -187,17 +254,13 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: transform 0.2s, border-color 0.2s, background-color 0.3s;
       animation: fadeIn 0.25s ease both;
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    .task-card:hover {
-      border-color: #475569;
     }
 
     .checkbox-custom {
@@ -379,11 +442,18 @@
 <body>
 
   <div class="app-container">
-    <!-- Encabezado -->
+    <!-- Encabezado con selector de color -->
     <header>
       <div class="title-area">
         <h1>Mi Espacio de Trabajo</h1>
         <p>Gestión de pendientes y metas</p>
+      </div>
+
+      <div class="theme-picker">
+        <div class="theme-dot dot-default active" onclick="setTheme('default', this)" title="Oscuro Neón"></div>
+        <div class="theme-dot dot-emerald" onclick="setTheme('emerald', this)" title="Esmeralda"></div>
+        <div class="theme-dot dot-violet" onclick="setTheme('violet', this)" title="Violeta Cyber"></div>
+        <div class="theme-dot dot-light" onclick="setTheme('light', this)" title="Modo Claro"></div>
       </div>
     </header>
 
@@ -447,7 +517,7 @@
   </div>
 
   <script>
-    // Inicialización del Estado y localStorage
+    // Inicialización de Estado y localStorage
     let tasks = JSON.parse(localStorage.getItem('organizador_tareas')) || [
       { id: 1, title: 'Diseñar interfaz del Dashboard', category: 'programacion', date: '2026-08-05', completed: true },
       { id: 2, title: 'Organizar documentación administrativa', category: 'admin', date: '2026-08-10', completed: false },
@@ -455,6 +525,25 @@
     ];
 
     let currentFilter = 'all';
+
+    // Manejo de Temas de Color
+    function setTheme(theme, el) {
+      if (theme === 'default') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+      localStorage.setItem('organizador_tema', theme);
+
+      document.querySelectorAll('.theme-dot').forEach(dot => dot.classList.remove('active'));
+      if(el) el.classList.add('active');
+    }
+
+    function loadSavedTheme() {
+      const savedTheme = localStorage.getItem('organizador_tema') || 'default';
+      const targetDot = document.querySelector(`.dot-${savedTheme}`);
+      setTheme(savedTheme, targetDot);
+    }
 
     function saveTasks() {
       localStorage.setItem('organizador_tareas', JSON.stringify(tasks));
@@ -566,6 +655,7 @@
     }
 
     // Carga inicial
+    loadSavedTheme();
     render();
   </script>
 </body>
