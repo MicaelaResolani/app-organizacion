@@ -3,23 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizador Personal — Dashboard & Tareas</title>
+  <title>Organizador Personal — Dashboard Completo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* TEMAS DE COLORES */
     :root {
-      /* Tema por defecto: Oscuro Neón */
       --bg: #0f172a;
       --card-bg: #1e293b;
-      --card-hover: #334155;
       --border: #334155;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --accent: #6366f1;
       --accent-hover: #4f46e5;
       
-      /* Categorías */
       --cat-trabajo: #38bdf8;
       --cat-admin: #fbbf24;
       --cat-proyectos: #c084fc;
@@ -27,39 +23,6 @@
       
       --danger: #f43f5e;
       --radius: 16px;
-    }
-
-    [data-theme="emerald"] {
-      --bg: #064e3b;
-      --card-bg: #065f46;
-      --card-hover: #047857;
-      --border: #047857;
-      --text: #ecfdf5;
-      --text-muted: #a7f3d0;
-      --accent: #10b981;
-      --accent-hover: #059669;
-    }
-
-    [data-theme="violet"] {
-      --bg: #1e1b4b;
-      --card-bg: #2e1065;
-      --card-hover: #3b0764;
-      --border: #4c1d95;
-      --text: #faf5ff;
-      --text-muted: #c084fc;
-      --accent: #a855f7;
-      --accent-hover: #9333ea;
-    }
-
-    [data-theme="light"] {
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --card-hover: #f1f5f9;
-      --border: #e2e8f0;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -73,25 +36,22 @@
       justify-content: center;
       padding: 20px 16px 60px;
       -webkit-font-smoothing: antialiased;
-      transition: background-color 0.3s, color 0.3s;
     }
 
     .app-container {
       width: 100%;
-      max-width: 680px;
+      max-width: 720px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    /* HEADER & PALETA DE COLORES */
+    /* HEADER */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 0;
-      gap: 12px;
-      flex-wrap: wrap;
     }
 
     .title-area h1 {
@@ -106,35 +66,8 @@
       margin-top: 2px;
     }
 
-    .theme-picker {
-      display: flex;
-      gap: 8px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 99px;
-      align-items: center;
-    }
-
-    .theme-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-
-    .theme-dot:hover { transform: scale(1.15); }
-    .theme-dot.active { border-color: var(--text); transform: scale(1.15); }
-
-    .dot-default { background: linear-gradient(135deg, #0f172a, #6366f1); }
-    .dot-emerald { background: linear-gradient(135deg, #064e3b, #10b981); }
-    .dot-violet { background: linear-gradient(135deg, #1e1b4b, #a855f7); }
-    .dot-light { background: linear-gradient(135deg, #ffffff, #2563eb); border: 1px solid #cbd5e1; }
-
-    /* DASHBOARD */
-    .dashboard-card {
+    /* DASHBOARD Y PANELES */
+    .dashboard-card, .panel-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -143,7 +76,14 @@
       flex-direction: column;
       gap: 14px;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
-      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .dash-metrics {
@@ -183,10 +123,10 @@
       width: 0%;
       background: var(--accent);
       border-radius: 99px;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* CONTROLES Y FILTROS */
+    /* FILTROS Y BOTONES */
     .controls-row {
       display: flex;
       justify-content: space-between;
@@ -233,11 +173,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background-color 0.2s, transform 0.1s;
     }
-
-    .add-btn:hover { background: var(--accent-hover); }
-    .add-btn:active { transform: scale(0.97); }
 
     /* LISTA DE TAREAS */
     .task-list {
@@ -254,13 +190,6 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      transition: transform 0.2s, border-color 0.2s, background-color 0.3s;
-      animation: fadeIn 0.25s ease both;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .checkbox-custom {
@@ -273,7 +202,6 @@
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: all 0.2s;
     }
 
     .task-card.completed .checkbox-custom {
@@ -301,8 +229,6 @@
     .task-title {
       font-size: 15px;
       font-weight: 600;
-      line-height: 1.3;
-      transition: color 0.2s, text-decoration 0.2s;
     }
 
     .task-card.completed .task-title {
@@ -323,7 +249,6 @@
       font-weight: 700;
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
     }
 
     .badge.trabajo { background: rgba(56, 189, 248, 0.15); color: var(--cat-trabajo); }
@@ -331,37 +256,70 @@
     .badge.proyectos { background: rgba(192, 132, 252, 0.15); color: var(--cat-proyectos); }
     .badge.programacion { background: rgba(52, 211, 153, 0.15); color: var(--cat-prog); }
 
-    .task-date {
-      color: var(--text-muted);
-    }
-
     .delete-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
       padding: 6px;
-      border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
-      transition: color 0.2s, background 0.2s;
     }
 
-    .delete-btn:hover {
-      color: var(--danger);
-      background: rgba(244, 63, 94, 0.1);
+    .delete-btn:hover { color: var(--danger); }
+
+    /* SECCIÓN DE SUEÑO Y HÁBITOS */
+    .sleep-inputs {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
-      font-size: 14px;
-      background: var(--card-bg);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
+    .sleep-inputs input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-family: inherit;
     }
 
-    /* FORMULARIO MODAL */
+    /* SECCIÓN DE CONFIGURACIÓN Y SELECTORES DE COLOR PERSONALIZADOS */
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .color-picker-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .color-picker-item span {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .color-picker-item input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      background: none;
+    }
+
+    .color-picker-item input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker-item input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+
+    /* MODAL */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -386,12 +344,6 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
-    }
-
-    .modal-card h2 {
-      font-size: 18px;
-      font-weight: 700;
     }
 
     .field {
@@ -414,18 +366,12 @@
       border-radius: 8px;
       font-size: 14px;
       font-family: inherit;
-      outline: none;
-    }
-
-    .field input:focus, .field select:focus {
-      border-color: var(--accent);
     }
 
     .modal-actions {
       display: flex;
       justify-content: flex-end;
       gap: 10px;
-      margin-top: 8px;
     }
 
     .btn-secondary {
@@ -435,29 +381,21 @@
       padding: 10px 16px;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
     }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    <!-- Encabezado con selector de color -->
+    <!-- Encabezado -->
     <header>
       <div class="title-area">
         <h1>Mi Espacio de Trabajo</h1>
-        <p>Gestión de pendientes y metas</p>
-      </div>
-
-      <div class="theme-picker">
-        <div class="theme-dot dot-default active" onclick="setTheme('default', this)" title="Oscuro Neón"></div>
-        <div class="theme-dot dot-emerald" onclick="setTheme('emerald', this)" title="Esmeralda"></div>
-        <div class="theme-dot dot-violet" onclick="setTheme('violet', this)" title="Violeta Cyber"></div>
-        <div class="theme-dot dot-light" onclick="setTheme('light', this)" title="Modo Claro"></div>
+        <p>Gestión de pendientes, registro de descanso y personalización</p>
       </div>
     </header>
 
-    <!-- Dashboard -->
+    <!-- Dashboard Principal -->
     <div class="dashboard-card">
       <div class="dash-metrics">
         <div class="metric-group">
@@ -474,7 +412,28 @@
       </div>
     </div>
 
-    <!-- Filtros y Botón de creación -->
+    <!-- Panel de Registro de Sueño (INTACTO) -->
+    <div class="panel-card">
+      <div class="panel-title">🌙 Registro de Sueño y Descanso</div>
+      <div class="sleep-inputs">
+        <div>
+          <span style="font-size: 12px; color: var(--text-muted); display: block;">Horas dormidas:</span>
+          <input type="number" id="sleep-hours" min="0" max="24" step="0.5" placeholder="Ej: 7.5">
+        </div>
+        <div>
+          <span style="font-size: 12px; color: var(--text-muted); display: block;">Calidad:</span>
+          <select id="sleep-quality" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 8px;">
+            <option value="Bueno">😊 Bueno</option>
+            <option value="Regular">😐 Regular</option>
+            <option value="Malo">😫 Malo</option>
+          </select>
+        </div>
+        <button class="add-btn" style="margin-top: 15px;" onclick="saveSleep()">Guardar</button>
+      </div>
+      <div id="sleep-history" style="font-size: 13px; color: var(--text-muted); margin-top: 6px;"></div>
+    </div>
+
+    <!-- Filtros y Botón Crear Tarea -->
     <div class="controls-row">
       <div class="filter-tabs">
         <button class="filter-btn active" onclick="setFilter('all', this)">Todas</button>
@@ -484,11 +443,40 @@
       <button class="add-btn" onclick="openModal()">+ Nueva tarea</button>
     </div>
 
-    <!-- Lista de tareas -->
+    <!-- Lista de Tareas -->
     <div class="task-list" id="task-list"></div>
+
+    <!-- Panel de Ajustes y Personalización de Colores (NUEVO) -->
+    <div class="panel-card">
+      <div class="panel-title">⚙️ Personalización de Colores (Libre Choice)</div>
+      <p style="font-size: 13px; color: var(--text-muted);">Elegí el color exacto que quieras para cada elemento de la interfaz:</p>
+      
+      <div class="config-grid">
+        <div class="color-picker-item">
+          <span>Fondo Principal</span>
+          <input type="color" id="picker-bg" value="#0f172a" onchange="updateColor('--bg', this.value)">
+        </div>
+        <div class="color-picker-item">
+          <span>Tarjetas / Paneles</span>
+          <input type="color" id="picker-card" value="#1e293b" onchange="updateColor('--card-bg', this.value)">
+        </div>
+        <div class="color-picker-item">
+          <span>Bordes / Separadores</span>
+          <input type="color" id="picker-border" value="#334155" onchange="updateColor('--border', this.value)">
+        </div>
+        <div class="color-picker-item">
+          <span>Color Botones / Acento</span>
+          <input type="color" id="picker-accent" value="#6366f1" onchange="updateColor('--accent', this.value)">
+        </div>
+        <div class="color-picker-item">
+          <span>Texto Principal</span>
+          <input type="color" id="picker-text" value="#f8fafc" onchange="updateColor('--text', this.value)">
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Modal para Agregar Tarea -->
+  <!-- Modal Tareas -->
   <div class="modal-backdrop hidden" id="modal">
     <div class="modal-card">
       <h2>Agregar nuevo pendiente</h2>
@@ -506,7 +494,7 @@
         </select>
       </div>
       <div class="field">
-        <label for="task-date">Fecha límite (opcional)</label>
+        <label for="task-date">Fecha límite</label>
         <input type="date" id="task-date">
       </div>
       <div class="modal-actions">
@@ -517,34 +505,59 @@
   </div>
 
   <script>
-    // Inicialización de Estado y localStorage
+    // ESTADO DE TAREAS
     let tasks = JSON.parse(localStorage.getItem('organizador_tareas')) || [
       { id: 1, title: 'Diseñar interfaz del Dashboard', category: 'programacion', date: '2026-08-05', completed: true },
-      { id: 2, title: 'Organizar documentación administrativa', category: 'admin', date: '2026-08-10', completed: false },
-      { id: 3, title: 'Reunión de coordinación de proyecto', category: 'trabajo', date: '2026-08-02', completed: false }
+      { id: 2, title: 'Organizar documentación administrativa', category: 'admin', date: '2026-08-10', completed: false }
     ];
 
     let currentFilter = 'all';
 
-    // Manejo de Temas de Color
-    function setTheme(theme, el) {
-      if (theme === 'default') {
-        document.documentElement.removeAttribute('data-theme');
+    // MANEJO LIBRE DE COLORES (localStorage)
+    const customColors = JSON.parse(localStorage.getItem('organizador_colores_custom')) || {};
+
+    function updateColor(variableCss, value) {
+      document.documentElement.style.setProperty(variableCss, value);
+      customColors[variableCss] = value;
+      localStorage.setItem('organizador_colores_custom', JSON.stringify(customColors));
+    }
+
+    function loadCustomColors() {
+      Object.keys(customColors).forEach(variableCss => {
+        document.documentElement.style.setProperty(variableCss, customColors[variableCss]);
+        
+        // Sincronizar selectores de color al cargar
+        if(variableCss === '--bg') document.getElementById('picker-bg').value = customColors[variableCss];
+        if(variableCss === '--card-bg') document.getElementById('picker-card').value = customColors[variableCss];
+        if(variableCss === '--border') document.getElementById('picker-border').value = customColors[variableCss];
+        if(variableCss === '--accent') document.getElementById('picker-accent').value = customColors[variableCss];
+        if(variableCss === '--text') document.getElementById('picker-text').value = customColors[variableCss];
+      });
+    }
+
+    // MANEJO DE SUEÑO
+    let sleepLog = JSON.parse(localStorage.getItem('organizador_sueño')) || null;
+
+    function saveSleep() {
+      const hours = document.getElementById('sleep-hours').value;
+      const quality = document.getElementById('sleep-quality').value;
+      if (!hours) return;
+
+      sleepLog = { hours, quality, date: new Date().toLocaleDateString() };
+      localStorage.setItem('organizador_sueño', JSON.stringify(sleepLog));
+      renderSleep();
+    }
+
+    function renderSleep() {
+      const container = document.getElementById('sleep-history');
+      if (sleepLog) {
+        container.innerHTML = `Último registro (${sleepLog.date}): <strong>${sleepLog.hours} hrs</strong> — Calidad: ${sleepLog.quality}`;
       } else {
-        document.documentElement.setAttribute('data-theme', theme);
+        container.innerText = 'Sin registros recientes.';
       }
-      localStorage.setItem('organizador_tema', theme);
-
-      document.querySelectorAll('.theme-dot').forEach(dot => dot.classList.remove('active'));
-      if(el) el.classList.add('active');
     }
 
-    function loadSavedTheme() {
-      const savedTheme = localStorage.getItem('organizador_tema') || 'default';
-      const targetDot = document.querySelector(`.dot-${savedTheme}`);
-      setTheme(savedTheme, targetDot);
-    }
-
+    // OPERACIONES TAREAS
     function saveTasks() {
       localStorage.setItem('organizador_tareas', JSON.stringify(tasks));
       render();
@@ -567,16 +580,8 @@
       saveTasks();
     }
 
-    function openModal() {
-      document.getElementById('modal').classList.remove('hidden');
-      document.getElementById('task-title').focus();
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-      document.getElementById('task-title').value = '';
-      document.getElementById('task-date').value = '';
-    }
+    function openModal() { document.getElementById('modal').classList.remove('hidden'); }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
     function addTask() {
       const title = document.getElementById('task-title').value.trim();
@@ -585,34 +590,23 @@
 
       if (!title) return;
 
-      const newTask = {
+      tasks.unshift({
         id: Date.now(),
         title,
         category,
         date: date || 'Sin fecha',
         completed: false
-      };
+      });
 
-      tasks.unshift(newTask);
       saveTasks();
       closeModal();
-    }
-
-    function getCategoryLabel(cat) {
-      const map = {
-        trabajo: 'Trabajo',
-        admin: 'Administración',
-        proyectos: 'Proyecto',
-        programacion: 'Programación'
-      };
-      return map[cat] || cat;
+      document.getElementById('task-title').value = '';
     }
 
     function render() {
       const listEl = document.getElementById('task-list');
       listEl.innerHTML = '';
 
-      // Calcular Métricas Dashboard
       const total = tasks.length;
       const completed = tasks.filter(t => t.completed).length;
       const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
@@ -621,7 +615,6 @@
       document.getElementById('completed-count').innerText = `${completed} / ${total}`;
       document.getElementById('progress-fill').style.width = `${percent}%`;
 
-      // Filtrado
       const filteredTasks = tasks.filter(t => {
         if (currentFilter === 'pending') return !t.completed;
         if (currentFilter === 'completed') return t.completed;
@@ -629,11 +622,10 @@
       });
 
       if (filteredTasks.length === 0) {
-        listEl.innerHTML = `<div class="empty-state">No hay tareas para mostrar en esta categoría.</div>`;
+        listEl.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">No hay tareas acá.</div>`;
         return;
       }
 
-      // Renderizar Tarjetas
       filteredTasks.forEach(task => {
         const card = document.createElement('div');
         card.className = `task-card ${task.completed ? 'completed' : ''}`;
@@ -643,19 +635,20 @@
           <div class="task-content">
             <span class="task-title">${task.title}</span>
             <div class="task-meta">
-              <span class="badge ${task.category}">${getCategoryLabel(task.category)}</span>
-              ${task.date !== 'Sin fecha' ? `<span class="task-date">📅 ${task.date}</span>` : ''}
+              <span class="badge ${task.category}">${task.category}</span>
+              ${task.date !== 'Sin fecha' ? `<span style="color:var(--text-muted)">📅 ${task.date}</span>` : ''}
             </div>
           </div>
-          <button class="delete-btn" onclick="deleteTask(${task.id})" title="Eliminar">✕</button>
+          <button class="delete-btn" onclick="deleteTask(${task.id})">✕</button>
         `;
 
         listEl.appendChild(card);
       });
     }
 
-    // Carga inicial
-    loadSavedTheme();
+    // CARGA INICIAL
+    loadCustomColors();
+    renderSleep();
     render();
   </script>
 </body>
