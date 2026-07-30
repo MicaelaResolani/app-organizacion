@@ -1,137 +1,230 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  TextInput, 
+  TouchableOpacity, 
+  FlatList, 
+  SafeAreaView, 
   StatusBar,
+  Platform 
 } from 'react-native';
 
 export default function App() {
-  const [task, setTask] = useState('');
-  const [tasks, setTasks] = useState([
-    { id: '1', text: 'Planificar pendientes de la semana' },
-    { id: '2', text: 'Revisar novedades en la app' },
+  const [tareas, setTareas] = useState([
+    { id: '1', texto: 'Revisar documentación del proyecto', completada: false },
+    { id: '2', texto: 'Organizar tareas de la semana', completada: true },
   ]);
+  const [nuevaTarea, setNuevaTarea] = useState('');
 
-  const addTask = () => {
-    if (task.trim()) {
-      setTasks([...tasks, { id: Date.now().toString(), text: task.trim() }]);
-      setTask('');
-    }
+  const agregarTarea = () => {
+    if (nuevaTarea.trim() === '') return;
+    setTareas([
+      ...tareas,
+      { id: Date.now().toString(), texto: nuevaTarea, completada: false }
+    ]);
+    setNuevaTarea('');
   };
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((t) => t.id !== id));
+  const alternarCompletada = (id) => {
+    setTareas(tareas.map(t => t.id === id ? { ...t, completada: !t.completada } : t));
+  };
+
+  const eliminarTarea = (id) => {
+    setTareas(tareas.filter(t => t.id !== id));
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <Text style={styles.title}>📌 App de Organización</Text>
-        <Text style={styles.subtitle}>Gestión de tareas y pendientes</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#f4f6f8" />
+      <View style={styles.wrapper}>
+        <View style={styles.container}>
+          
+          {/* Encabezado */}
+          <View style={styles.header}>
+            <Text style={styles.titulo}>Mi Organización</Text>
+            <Text style={styles.subtitulo}>Gestión simple y rápida</Text>
+          </View>
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Escribí una nueva tarea..."
-          placeholderTextColor="#9CA3AF"
-          value={task}
-          onChangeText={setTask}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={addTask}>
-          <Text style={styles.buttonText}>Agregar</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={tasks}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.taskCard}>
-            <Text style={styles.taskText}>{item.text}</Text>
-            <TouchableOpacity onPress={() => deleteTask(item.id)}>
-              <Text style={styles.deleteText}>🗑️</Text>
+          {/* Formulario de entrada */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Escribí una nueva tarea..."
+              placeholderTextColor="#999"
+              value={nuevaTarea}
+              onChangeText={setNuevaTarea}
+            />
+            <TouchableOpacity style={styles.botonAgregar} onPress={agregarTarea}>
+              <Text style={styles.textoBotonAgregar}>+</Text>
             </TouchableOpacity>
           </View>
-        )}
-      />
+
+          {/* Lista de tareas */}
+          <FlatList
+            data={tareas}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listaContainer}
+            renderItem={({ item }) => (
+              <View style={styles.tarjetaTarea}>
+                <TouchableOpacity 
+                  style={styles.checkArea} 
+                  onPress={() => alternarCompletada(item.id)}
+                >
+                  <View style={[styles.checkbox, item.completada && styles.checkboxCompletado]}>
+                    {item.completada && <Text style={styles.checkText}>✓</Text>}
+                  </View>
+                  <Text style={[styles.textoTarea, item.completada && styles.textoCompletado]}>
+                    {item.texto}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => eliminarTarea(item.id)}>
+                  <Text style={styles.botonEliminar}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f4f6f8',
+  },
+  wrapper: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center', // Centra la tarjeta en pantallas grandes de PC
+    justifyContent: 'center',
+    paddingVertical: Platform.OS === 'web' ? 20 : 0,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    maxWidth: 600,
     width: '100%',
-    alignSelf: 'center',
+    maxWidth: 480, // Límite clave para que en la PC no se desparrame
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    // Sombras para que se vea como una tarjeta flotante
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.08)',
+        borderRadius: 16,
+        maxHeight: '90vh',
+      },
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      }
+    }),
   },
   header: {
     marginBottom: 20,
   },
-  title: {
+  titulo: {
     fontSize: 26,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontWeight: '700',
+    color: '#1e293b',
   },
-  subtitle: {
+  subtitulo: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#64748b',
     marginTop: 4,
   },
   inputContainer: {
     flexDirection: 'row',
     marginBottom: 20,
+    gap: 10,
   },
   input: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    borderRadius: 8,
+    height: 48,
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    marginRight: 10,
+    borderColor: '#e2e8f0',
     fontSize: 15,
+    color: '#334155',
   },
-  addButton: {
-    backgroundColor: '#2563EB',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  taskCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  botonAgregar: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#2563eb',
+    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textoBotonAgregar: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: '600',
+    marginTop: -2,
+  },
+  listaContainer: {
+    paddingBottom: 20,
+  },
+  tarjetaTarea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8fafc',
+    padding: 14,
+    borderRadius: 12,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#f1f5f9',
   },
-  taskText: {
+  checkArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#cbd5e1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+  },
+  checkboxCompletado: {
+    backgroundColor: '#2563eb',
+    borderColor: '#2563eb',
+  },
+  checkText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  textoTarea: {
     fontSize: 15,
-    color: '#374151',
+    color: '#334155',
     flex: 1,
   },
-  deleteText: {
-    fontSize: 18,
-    marginLeft: 10,
+  textoCompletado: {
+    textDecorationLine: 'line-through',
+    color: '#94a3b8',
+  },
+  botonEliminar: {
+    color: '#ef4444',
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingHorizontal: 8,
   },
 });
