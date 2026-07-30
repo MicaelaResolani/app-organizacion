@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizador Personal — Dashboard Completo</title>
+  <title>Organizador Personal & Control de Sueño</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -40,13 +40,12 @@
 
     .app-container {
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    /* HEADER */
     header {
       display: flex;
       justify-content: space-between;
@@ -66,16 +65,22 @@
       margin-top: 2px;
     }
 
-    /* DASHBOARD Y PANELES */
-    .dashboard-card, .panel-card {
+    /* PANELES Y TARJETAS */
+    .panel-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .panel-title {
@@ -86,6 +91,7 @@
       gap: 8px;
     }
 
+    /* METRICAS DE DASHBOARD */
     .dash-metrics {
       display: flex;
       justify-content: space-between;
@@ -126,7 +132,88 @@
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* FILTROS Y BOTONES */
+    /* SECCIÓN COMPLETA DE SUEÑO */
+    .sleep-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .sleep-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sleep-field label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .sleep-field input, .sleep-field select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .sleep-stats-row {
+      display: flex;
+      gap: 16px;
+      background: var(--bg);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .sleep-stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sleep-stat-val {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .sleep-stat-lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .sleep-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .sleep-history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .sleep-item-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* CONTROLES Y FILTROS */
     .controls-row {
       display: flex;
       justify-content: space-between;
@@ -175,7 +262,9 @@
       gap: 6px;
     }
 
-    /* LISTA DE TAREAS */
+    .add-btn:hover { background: var(--accent-hover); }
+
+    /* LISTA TAREAS */
     .task-list {
       display: flex;
       flex-direction: column;
@@ -266,29 +355,11 @@
 
     .delete-btn:hover { color: var(--danger); }
 
-    /* SECCIÓN DE SUEÑO Y HÁBITOS */
-    .sleep-inputs {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .sleep-inputs input {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-family: inherit;
-    }
-
-    /* SECCIÓN DE CONFIGURACIÓN Y SELECTORES DE COLOR PERSONALIZADOS */
+    /* SECCIÓN CONFIGURACIÓN DE COLORES LIBRE */
     .config-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-top: 8px;
+      gap: 14px;
     }
 
     .color-picker-item {
@@ -387,16 +458,15 @@
 <body>
 
   <div class="app-container">
-    <!-- Encabezado -->
     <header>
       <div class="title-area">
-        <h1>Mi Espacio de Trabajo</h1>
-        <p>Gestión de pendientes, registro de descanso y personalización</p>
+        <h1>Mi Espacio Personal</h1>
+        <p>Tareas, métricas de descanso y personalización libre</p>
       </div>
     </header>
 
-    <!-- Dashboard Principal -->
-    <div class="dashboard-card">
+    <!-- DASHBOARD DE TAREAS -->
+    <div class="panel-card">
       <div class="dash-metrics">
         <div class="metric-group">
           <span class="metric-value" id="progress-percent">0%</span>
@@ -412,28 +482,61 @@
       </div>
     </div>
 
-    <!-- Panel de Registro de Sueño (INTACTO) -->
+    <!-- REGISTRO Y SEGUIMIENTO COMPLETO DE SUEÑO -->
     <div class="panel-card">
-      <div class="panel-title">🌙 Registro de Sueño y Descanso</div>
-      <div class="sleep-inputs">
-        <div>
-          <span style="font-size: 12px; color: var(--text-muted); display: block;">Horas dormidas:</span>
+      <div class="panel-header">
+        <div class="panel-title">🌙 Monitor de Descanso y Sueño</div>
+        <span style="font-size: 12px; color: var(--text-muted);" id="target-display">Meta: 8.0 hs</span>
+      </div>
+
+      <!-- Formularios de Carga de Sueño -->
+      <div class="sleep-grid">
+        <div class="sleep-field">
+          <label for="sleep-date">Fecha</label>
+          <input type="date" id="sleep-date">
+        </div>
+        <div class="sleep-field">
+          <label for="sleep-hours">Horas Dormidas</label>
           <input type="number" id="sleep-hours" min="0" max="24" step="0.5" placeholder="Ej: 7.5">
         </div>
-        <div>
-          <span style="font-size: 12px; color: var(--text-muted); display: block;">Calidad:</span>
-          <select id="sleep-quality" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 8px;">
-            <option value="Bueno">😊 Bueno</option>
+        <div class="sleep-field">
+          <label for="sleep-quality">Calidad del Sueño</label>
+          <select id="sleep-quality">
+            <option value="Excelente">😴 Excelente</option>
+            <option value="Buena" selected>😊 Buena</option>
             <option value="Regular">😐 Regular</option>
-            <option value="Malo">😫 Malo</option>
+            <option value="Mala">😫 Mala</option>
           </select>
         </div>
-        <button class="add-btn" style="margin-top: 15px;" onclick="saveSleep()">Guardar</button>
+        <div class="sleep-field" style="justify-content: flex-end;">
+          <button class="add-btn" onclick="addSleepRecord()">Guardar Registro</button>
+        </div>
       </div>
-      <div id="sleep-history" style="font-size: 13px; color: var(--text-muted); margin-top: 6px;"></div>
+
+      <!-- Resumen Estadístico de Sueño -->
+      <div class="sleep-stats-row">
+        <div class="sleep-stat-item">
+          <span class="sleep-stat-val" id="stat-avg">0 hs</span>
+          <span class="sleep-stat-lbl">Promedio Registrado</span>
+        </div>
+        <div class="sleep-stat-item">
+          <span class="sleep-stat-val" id="stat-last">0 hs</span>
+          <span class="sleep-stat-lbl">Última Noche</span>
+        </div>
+        <div class="sleep-stat-item">
+          <span class="sleep-stat-val" id="stat-count">0</span>
+          <span class="sleep-stat-lbl">Noches Anotadas</span>
+        </div>
+      </div>
+
+      <!-- Historial Diario de Sueño -->
+      <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-top: 4px;">Historial de Noches:</div>
+      <div class="sleep-history-list" id="sleep-history-list">
+        <!-- Carga dinámica -->
+      </div>
     </div>
 
-    <!-- Filtros y Botón Crear Tarea -->
+    <!-- CONTROLES Y LISTA DE TAREAS -->
     <div class="controls-row">
       <div class="filter-tabs">
         <button class="filter-btn active" onclick="setFilter('all', this)">Todas</button>
@@ -443,13 +546,12 @@
       <button class="add-btn" onclick="openModal()">+ Nueva tarea</button>
     </div>
 
-    <!-- Lista de Tareas -->
     <div class="task-list" id="task-list"></div>
 
-    <!-- Panel de Ajustes y Personalización de Colores (NUEVO) -->
+    <!-- CONFIGURACIÓN DE COLORES TOTALMENTE LIBRE -->
     <div class="panel-card">
-      <div class="panel-title">⚙️ Personalización de Colores (Libre Choice)</div>
-      <p style="font-size: 13px; color: var(--text-muted);">Elegí el color exacto que quieras para cada elemento de la interfaz:</p>
+      <div class="panel-title">🎨 Configuración Personalizada de Colores</div>
+      <p style="font-size: 13px; color: var(--text-muted);">Hacé clic en cualquier círculo para cambiar el color con la paleta de tu navegador:</p>
       
       <div class="config-grid">
         <div class="color-picker-item">
@@ -461,11 +563,11 @@
           <input type="color" id="picker-card" value="#1e293b" onchange="updateColor('--card-bg', this.value)">
         </div>
         <div class="color-picker-item">
-          <span>Bordes / Separadores</span>
+          <span>Bordes</span>
           <input type="color" id="picker-border" value="#334155" onchange="updateColor('--border', this.value)">
         </div>
         <div class="color-picker-item">
-          <span>Color Botones / Acento</span>
+          <span>Botones / Acento</span>
           <input type="color" id="picker-accent" value="#6366f1" onchange="updateColor('--accent', this.value)">
         </div>
         <div class="color-picker-item">
@@ -476,7 +578,7 @@
     </div>
   </div>
 
-  <!-- Modal Tareas -->
+  <!-- MODAL DE NUEVA TAREA -->
   <div class="modal-backdrop hidden" id="modal">
     <div class="modal-card">
       <h2>Agregar nuevo pendiente</h2>
@@ -513,7 +615,13 @@
 
     let currentFilter = 'all';
 
-    // MANEJO LIBRE DE COLORES (localStorage)
+    // ESTADO DE SUEÑO (HISTORIAL DIARIO)
+    let sleepRecords = JSON.parse(localStorage.getItem('organizador_sueño_historial')) || [
+      { id: 1, date: '2026-07-29', hours: 7.5, quality: 'Buena' },
+      { id: 2, date: '2026-07-28', hours: 8.0, quality: 'Excelente' }
+    ];
+
+    // MANEJO LIBRE DE COLORES
     const customColors = JSON.parse(localStorage.getItem('organizador_colores_custom')) || {};
 
     function updateColor(variableCss, value) {
@@ -526,7 +634,6 @@
       Object.keys(customColors).forEach(variableCss => {
         document.documentElement.style.setProperty(variableCss, customColors[variableCss]);
         
-        // Sincronizar selectores de color al cargar
         if(variableCss === '--bg') document.getElementById('picker-bg').value = customColors[variableCss];
         if(variableCss === '--card-bg') document.getElementById('picker-card').value = customColors[variableCss];
         if(variableCss === '--border') document.getElementById('picker-border').value = customColors[variableCss];
@@ -535,39 +642,83 @@
       });
     }
 
-    // MANEJO DE SUEÑO
-    let sleepLog = JSON.parse(localStorage.getItem('organizador_sueño')) || null;
-
-    function saveSleep() {
-      const hours = document.getElementById('sleep-hours').value;
+    // OPERACIONES DE SUEÑO
+    function addSleepRecord() {
+      const date = document.getElementById('sleep-date').value;
+      const hours = parseFloat(document.getElementById('sleep-hours').value);
       const quality = document.getElementById('sleep-quality').value;
-      if (!hours) return;
 
-      sleepLog = { hours, quality, date: new Date().toLocaleDateString() };
-      localStorage.setItem('organizador_sueño', JSON.stringify(sleepLog));
+      if (!date || isNaN(hours) || hours <= 0) return;
+
+      const newRecord = {
+        id: Date.now(),
+        date,
+        hours,
+        quality
+      };
+
+      sleepRecords.unshift(newRecord);
+      localStorage.setItem('organizador_sueño_historial', JSON.stringify(sleepRecords));
+      
+      document.getElementById('sleep-hours').value = '';
+      renderSleep();
+    }
+
+    function deleteSleepRecord(id) {
+      sleepRecords = sleepRecords.filter(r => r.id !== id);
+      localStorage.setItem('organizador_sueño_historial', JSON.stringify(sleepRecords));
       renderSleep();
     }
 
     function renderSleep() {
-      const container = document.getElementById('sleep-history');
-      if (sleepLog) {
-        container.innerHTML = `Último registro (${sleepLog.date}): <strong>${sleepLog.hours} hrs</strong> — Calidad: ${sleepLog.quality}`;
-      } else {
-        container.innerText = 'Sin registros recientes.';
+      const listEl = document.getElementById('sleep-history-list');
+      listEl.innerHTML = '';
+
+      if (sleepRecords.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--text-muted); font-size: 13px;">No hay registros de sueño guardados.</div>`;
+        document.getElementById('stat-avg').innerText = '0 hs';
+        document.getElementById('stat-last').innerText = '0 hs';
+        document.getElementById('stat-count').innerText = '0';
+        return;
       }
+
+      // Cálculos estadísticos
+      const totalHours = sleepRecords.reduce((sum, r) => sum + r.hours, 0);
+      const avg = (totalHours / sleepRecords.length).toFixed(1);
+      const last = sleepRecords[0].hours;
+
+      document.getElementById('stat-avg').innerText = `${avg} hs`;
+      document.getElementById('stat-last').innerText = `${last} hs`;
+      document.getElementById('stat-count').innerText = sleepRecords.length;
+
+      // Renderizar historial
+      sleepRecords.forEach(rec => {
+        const item = document.createElement('div');
+        item.className = 'sleep-history-item';
+        
+        item.innerHTML = `
+          <div class="sleep-item-info">
+            <strong>📅 ${rec.date}</strong>
+            <span><strong>${rec.hours} hrs</strong> (${rec.quality})</span>
+          </div>
+          <button class="delete-btn" onclick="deleteSleepRecord(${rec.id})" title="Eliminar este registro">✕</button>
+        `;
+
+        listEl.appendChild(item);
+      });
     }
 
-    // OPERACIONES TAREAS
+    // OPERACIONES DE TAREAS
     function saveTasks() {
       localStorage.setItem('organizador_tareas', JSON.stringify(tasks));
-      render();
+      renderTasks();
     }
 
     function setFilter(filter, btn) {
       currentFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      render();
+      renderTasks();
     }
 
     function toggleTask(id) {
@@ -603,7 +754,7 @@
       document.getElementById('task-title').value = '';
     }
 
-    function render() {
+    function renderTasks() {
       const listEl = document.getElementById('task-list');
       listEl.innerHTML = '';
 
@@ -622,7 +773,7 @@
       });
 
       if (filteredTasks.length === 0) {
-        listEl.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">No hay tareas acá.</div>`;
+        listEl.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">No hay tareas para mostrar en este filtro.</div>`;
         return;
       }
 
@@ -646,10 +797,11 @@
       });
     }
 
-    // CARGA INICIAL
+    // INICIALIZACIÓN
+    document.getElementById('sleep-date').valueAsDate = new Date();
     loadCustomColors();
     renderSleep();
-    render();
+    renderTasks();
   </script>
 </body>
 </html>
