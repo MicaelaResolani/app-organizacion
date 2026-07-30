@@ -1,22 +1,707 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>App Organización</title>
-    <style>
-      #root, body, html {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mosaico — tu día en bloques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #15131c;
+    --surface: #1e1c28;
+    --surface-2: #272433;
+    --surface-3: #322e40;
+    --text: #f3f1f8;
+    --text-dim: #a29dbb;
+    --text-faint: #6f6a86;
+    --line: #343043;
+
+    --sleep: #7c6bff;
+    --sleep-soft: rgba(124,107,255,.14);
+    --work: #22b8a3;
+    --work-soft: rgba(34,184,163,.14);
+    --other: #ffb84d;
+    --other-soft: rgba(255,184,77,.14);
+
+    --coral: #ff6b6b;
+    --mint: #4ecdc4;
+    --gold: #ffd166;
+    --violet: #c77dff;
+    --green: #06d6a0;
+    --tangerine: #ff9f1c;
+
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --radius-sm: 11px;
+    --shadow: 0 10px 30px -12px rgba(0,0,0,.55);
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background: radial-gradient(120% 160% at 50% -10%, #221f2e 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3, .display{ font-family:'Baloo 2', 'Inter', sans-serif; }
+
+  #app{ max-width:480px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; position:relative; padding-bottom: 92px; }
+
+  ::-webkit-scrollbar{ display:none; }
+
+  button{ font-family:inherit; cursor:pointer; }
+  input, select{ font-family:inherit; }
+
+  .screen{ padding: 22px 20px 12px; animation: fadeUp .35s ease both; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---------- top bar ---------- */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 18px 20px 6px; }
+  .brand{ display:flex; align-items:center; gap:9px; }
+  .brand-mark{ width:30px; height:30px; border-radius:9px; background: conic-gradient(from 220deg, var(--coral), var(--gold), var(--mint), var(--sleep), var(--coral)); flex-shrink:0; }
+  .brand-name{ font-size:20px; font-weight:700; letter-spacing:.2px; }
+  .today-pill{ font-size:12px; color:var(--text-dim); background:var(--surface); border:1px solid var(--line); padding:6px 12px; border-radius:99px; text-transform:capitalize; }
+
+  /* ---------- nav ---------- */
+  .navbar{
+    position:fixed; bottom:0; left:0; right:0;
+    display:flex; justify-content:center;
+    padding: 10px 16px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+    z-index:40;
+  }
+  .navbar-inner{
+    width:100%; max-width:440px;
+    display:flex; gap:6px;
+    background: var(--surface); border:1px solid var(--line);
+    border-radius:20px; padding:6px; box-shadow: var(--shadow);
+  }
+  .nav-btn{
+    flex:1; background:none; border:none; color:var(--text-faint);
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:9px 4px; border-radius:14px; font-size:11.5px; font-weight:600;
+    transition: all .18s ease;
+  }
+  .nav-btn .ic{ font-size:18px; line-height:1; }
+  .nav-btn.active{ background:var(--surface-3); color:var(--text); }
+
+  /* ---------- generic ---------- */
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:18px; }
+  .muted{ color:var(--text-dim); font-size:14px; line-height:1.5; }
+  .section-title{ font-size:13px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); margin: 22px 2px 10px; }
+  .section-title:first-child{ margin-top:2px; }
+
+  label.field{ display:block; margin-bottom:16px; }
+  label.field span{ display:block; font-size:13px; font-weight:600; color:var(--text-dim); margin-bottom:7px; }
+  input[type=text], input[type=number], input[type=date], input[type=time]{
+    width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    padding:12px 13px; border-radius:var(--radius-sm); font-size:15px; font-weight:500;
+  }
+  input:focus, select:focus{ outline:2px solid var(--mint); outline-offset:1px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:14px 20px; border-radius:15px; border:none; font-weight:700; font-size:15px;
+    width:100%;
+  }
+  .btn-primary{ background: linear-gradient(135deg, var(--coral), var(--tangerine)); color:#1c1219; }
+  .btn-primary:active{ transform: scale(.98); }
+  .btn-ghost{ background:var(--surface-2); color:var(--text); border:1px solid var(--line); }
+  .btn-ghost:active{ transform: scale(.98); }
+  .btn-sm{ width:auto; padding:9px 14px; font-size:13px; border-radius:12px; }
+  .btn-danger{ background:transparent; color:#ff8686; border:1px solid rgba(255,107,107,.35); }
+
+  .daychip{
+    padding:9px 0; border-radius:11px; text-align:center; font-size:12.5px; font-weight:700;
+    background:var(--surface-2); border:1px solid var(--line); color:var(--text-faint);
+  }
+  .daychip.on{ background: rgba(78,205,196,.16); border-color: var(--mint); color:var(--mint); }
+  .daydots{ display:grid; grid-template-columns: repeat(7,1fr); gap:6px; margin-bottom:16px; }
+
+  /* ---------- onboarding ---------- */
+  .ob-progress{ display:flex; gap:6px; margin-bottom:22px; }
+  .ob-progress div{ height:4px; flex:1; border-radius:99px; background:var(--surface-2); }
+  .ob-progress div.done{ background: linear-gradient(90deg, var(--coral), var(--gold)); }
+  .ob-hero{ font-size:34px; margin-bottom:6px; }
+  .ob-title{ font-size:24px; font-weight:700; margin:0 0 6px; }
+  .ob-sub{ color:var(--text-dim); font-size:14.5px; line-height:1.5; margin:0 0 24px; }
+
+  .other-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:11px 14px; margin-bottom:9px;
+  }
+  .other-item .ot-name{ font-weight:600; font-size:14px; }
+  .other-item .ot-meta{ font-size:12px; color:var(--text-faint); }
+  .icon-btn{ background:none; border:none; color:var(--text-faint); font-size:17px; padding:4px 6px; }
+
+  /* focus minutes stepper */
+  .stepper{ display:flex; align-items:center; justify-content:center; gap:22px; margin: 18px 0 8px; }
+  .stepper button{ width:46px; height:46px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line); color:var(--text); font-size:20px; font-weight:700; }
+  .stepper .val{ font-size:38px; font-weight:800; font-family:'Baloo 2'; min-width:90px; text-align:center; }
+  .stepper .unit{ text-align:center; color:var(--text-dim); font-size:13px; margin-top:-6px; }
+
+  /* ---------- timeline (today) ---------- */
+  .now-row{ display:flex; align-items:center; gap:8px; margin: 4px 0 18px; }
+  .now-dot{ width:8px; height:8px; border-radius:50%; background:var(--coral); box-shadow:0 0 0 4px rgba(255,107,107,.18); animation:pulse 1.6s infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1;} 50%{opacity:.4;} }
+  .now-text{ font-size:13px; color:var(--text-dim); font-weight:600; }
+
+  .empty-state{ text-align:center; padding: 40px 16px; }
+  .empty-state .ic{ font-size:36px; margin-bottom:10px; }
+
+  .block{
+    display:flex; gap:12px; align-items:stretch;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:14px; margin-bottom:10px; position:relative; overflow:hidden;
+  }
+  .block::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background: var(--bar,var(--other)); }
+  .block-time{ font-size:12px; font-weight:700; color:var(--text-dim); min-width:52px; padding-top:2px; }
+  .block-main{ flex:1; }
+  .block-name{ font-weight:700; font-size:15px; margin-bottom:2px; }
+  .block-tag{ font-size:11.5px; color:var(--text-faint); font-weight:600; }
+  .block.done{ opacity:.45; }
+  .block.done .block-name{ text-decoration: line-through; }
+  .block-go{ align-self:center; background:var(--surface-3); border:none; color:var(--text); font-weight:700; font-size:12.5px; padding:9px 13px; border-radius:11px; white-space:nowrap; }
+
+  /* ---------- tasks list ---------- */
+  .task-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:16px; margin-bottom:12px; }
+  .task-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
+  .task-name{ font-weight:700; font-size:16px; }
+  .task-deadline{ font-size:12px; color:var(--text-faint); font-weight:600; margin-top:2px; }
+  .progress-track{ height:8px; border-radius:99px; background:var(--surface-2); overflow:hidden; margin:8px 0 6px; }
+  .progress-fill{ height:100%; border-radius:99px; background: linear-gradient(90deg, var(--mint), var(--green)); }
+  .task-meta-row{ display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); font-weight:600; }
+
+  .fab{
+    position:fixed; right:20px; bottom:104px; z-index:41;
+    width:56px; height:56px; border-radius:50%; border:none;
+    background: linear-gradient(135deg, var(--coral), var(--tangerine));
+    color:#1c1219; font-size:26px; font-weight:800; box-shadow: 0 10px 24px -8px rgba(255,107,107,.55);
+  }
+  .fab:active{ transform: scale(.94); }
+
+  /* ---------- modal ---------- */
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(10,9,14,.6); backdrop-filter: blur(2px); z-index:60; display:flex; align-items:flex-end; }
+  .modal-sheet{ width:100%; max-width:480px; margin:0 auto; background:var(--bg); border-radius:24px 24px 0 0; padding:22px 20px calc(24px + env(safe-area-inset-bottom)); max-height:88vh; overflow-y:auto; animation: slideUp .28s ease; border-top:1px solid var(--line); }
+  @keyframes slideUp{ from{ transform:translateY(30px); opacity:0;} to{ transform:translateY(0); opacity:1;} }
+  .sheet-handle{ width:36px; height:4px; background:var(--line); border-radius:99px; margin:0 auto 18px; }
+
+  /* ---------- focus mode ---------- */
+  .focus-screen{ position:fixed; inset:0; background: radial-gradient(140% 140% at 50% 0%, #241f33 0%, #100e17 60%); z-index:70; display:flex; flex-direction:column; padding: 26px 22px calc(30px + env(safe-area-inset-bottom)); }
+  .focus-top{ display:flex; justify-content:space-between; align-items:center; }
+  .focus-close{ background:var(--surface-2); border:1px solid var(--line); color:var(--text-dim); width:36px; height:36px; border-radius:50%; font-size:16px; }
+  .focus-tag{ font-size:12.5px; font-weight:700; color:var(--text-faint); text-align:center; }
+  .focus-body{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; }
+  .focus-task{ font-size:22px; font-weight:700; text-align:center; padding:0 10px; }
+  .ring-wrap{ position:relative; width:250px; height:250px; }
+  .ring-wrap svg{ transform: rotate(-90deg); width:100%; height:100%; }
+  .ring-time{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:46px; font-weight:800; font-family:'Baloo 2'; }
+  .focus-controls{ display:flex; gap:12px; width:100%; }
+  .focus-hint{ font-size:12.5px; color:var(--text-faint); text-align:center; }
+
+  /* ---------- celebration ---------- */
+  .celebrate-screen{ position:fixed; inset:0; background: radial-gradient(140% 140% at 50% 10%, #2a2140 0%, #100e17 62%); z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 26px; overflow:hidden; }
+  #confetti-canvas{ position:absolute; inset:0; pointer-events:none; }
+  .cel-emoji{ font-size:64px; margin-bottom:8px; animation: pop .5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pop{ from{ transform:scale(.3); opacity:0;} to{ transform:scale(1); opacity:1;} }
+  .cel-title{ font-size:26px; font-weight:800; margin: 4px 0 8px; }
+  .cel-sub{ color:var(--text-dim); font-size:14.5px; margin-bottom:30px; max-width:280px; }
+  .cel-actions{ display:flex; flex-direction:column; gap:10px; width:100%; max-width:280px; }
+
+  .setup-note{ background: var(--sleep-soft); border:1px solid rgba(124,107,255,.35); color:#d7d1ff; font-size:12.5px; padding:12px 14px; border-radius:13px; margin: 4px 0 20px; line-height:1.5; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ STORAGE HELPERS ============ */
+async function loadState(key, fallback){
+  try{
+    const r = localStorage.getItem(key);
+    return r ? JSON.parse(r) : fallback;
+  }catch(e){ return fallback; }
+}
+async function saveState(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){ console.error('storage error', e); }
+}
+
+/* ============ APP STATE ============ */
+let CONFIG = null;
+let TASKS = [];
+let route = 'loading';
+let modalOpen = null;
+let obStep = 0;
+let obDraft = { sleepStart:'23:30', sleepEnd:'07:30', workDays:[1,2,3,4,5], workStart:'09:00', workEnd:'18:00', others:[], focusMinutes:30 };
+let otherDraft = { name:'', days:[], start:'', end:'' };
+let focusSession = null;
+let taskDraft = { name:'', hours:'', minutes:'', deadline:'' };
+
+const DAY_LABELS = ['D','L','M','M','J','V','S'];
+const DAY_NAMES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const TASK_COLORS = ['#ff6b6b','#4ecdc4','#ffd166','#c77dff','#06d6a0','#ff9f1c'];
+
+function taskColor(taskId){
+  let sum = 0; for(const ch of taskId) sum += ch.charCodeAt(0);
+  return TASK_COLORS[sum % TASK_COLORS.length];
+}
+
+/* ============ TIME HELPERS ============ */
+function toMin(hhmm){ const [h,m] = hhmm.split(':').map(Number); return h*60+m; }
+function toHHMM(min){ min = ((min%1440)+1440)%1440; const h = Math.floor(min/60), m = min%60; return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
+function fmtDate(d){ const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+function addDays(d,n){ const nd = new Date(d); nd.setDate(nd.getDate()+n); return nd; }
+function weekday(d){ return d.getDay(); }
+
+/* ============ FIXED BLOCKS FOR A GIVEN DAY ============ */
+function fixedBlocksForDate(dateObj){
+  const wd = weekday(dateObj);
+  const blocks = [];
+  const sStart = toMin(CONFIG.sleepStart), sEnd = toMin(CONFIG.sleepEnd);
+  if(sStart > sEnd){
+    blocks.push({start:0, end:sEnd, label:'Sueño', cat:'sleep'});
+    blocks.push({start:sStart, end:1440, label:'Sueño', cat:'sleep'});
+  } else {
+    blocks.push({start:sStart, end:sEnd, label:'Sueño', cat:'sleep'});
+  }
+  if(CONFIG.workDays.includes(wd)){
+    blocks.push({start:toMin(CONFIG.workStart), end:toMin(CONFIG.workEnd), label:'Trabajo', cat:'work'});
+  }
+  for(const o of CONFIG.others){
+    if(o.days.includes(wd)){
+      blocks.push({start:toMin(o.start), end:toMin(o.end), label:o.name, cat:'other'});
+    }
+  }
+  return blocks.sort((a,b)=>a.start-b.start);
+}
+
+function freeIntervalsForDate(dateObj){
+  const busy = fixedBlocksForDate(dateObj).map(b=>[Math.max(0,b.start), Math.min(1440,b.end)]).sort((a,b)=>a[0]-b[0]);
+  const merged = [];
+  for(const iv of busy){
+    if(merged.length && iv[0] <= merged[merged.length-1][1]) merged[merged.length-1][1] = Math.max(merged[merged.length-1][1], iv[1]);
+    else merged.push([...iv]);
+  }
+  const free = [];
+  let cursor = 0;
+  for(const [s,e] of merged){
+    if(s > cursor) free.push([cursor, s]);
+    cursor = Math.max(cursor, e);
+  }
+  if(cursor < 1440) free.push([cursor, 1440]);
+  const today = new Date(); today.setHours(0,0,0,0);
+  if(fmtDate(dateObj) === fmtDate(today)){
+    const nowMin = new Date().getHours()*60 + new Date().getMinutes();
+    const trimmed = [];
+    for(const [s,e] of free){
+      if(e <= nowMin) continue;
+      trimmed.push([Math.max(s, nowMin+5), e]);
+    }
+    return trimmed.filter(iv=>iv[1]-iv[0] >= 10);
+  }
+  return free.filter(iv=>iv[1]-iv[0] >= 10);
+}
+
+/* ============ SCHEDULER ============ */
+function scheduleTask(task){
+  const focus = CONFIG.focusMinutes;
+  const breakMin = 5;
+  let remaining = task.totalMinutes;
+  const blocks = [];
+  const deadline = new Date(task.deadline + 'T23:59:00');
+  let cursorDate = new Date(); cursorDate.setHours(0,0,0,0);
+  let guard = 0;
+  while(remaining > 0 && cursorDate <= deadline && guard < 60){
+    guard++;
+    const dateStr = fmtDate(cursorDate);
+    const used = [];
+    for(const t of TASKS){
+      if(t.id === task.id) continue;
+      for(const b of t.blocks){ if(b.date === dateStr) used.push([toMin(b.start), toMin(b.end)]); }
+    }
+    for(const b of blocks){ if(b.date === dateStr) used.push([toMin(b.start), toMin(b.end)]); }
+    let free = freeIntervalsForDate(cursorDate);
+    for(const [us,ue] of used.sort((a,b)=>a[0]-b[0])){
+      const next = [];
+      for(const [fs,fe] of free){
+        if(ue <= fs || us >= fe){ next.push([fs,fe]); continue; }
+        if(us > fs) next.push([fs, us]);
+        if(ue < fe) next.push([ue, fe]);
       }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+      free = next;
+    }
+    for(const [fs,fe] of free){
+      let pos = fs;
+      while(remaining > 0 && pos + focus <= fe){
+        const dur = Math.min(focus, remaining);
+        blocks.push({date: dateStr, start: toHHMM(pos), end: toHHMM(pos+dur), done:false});
+        remaining -= dur;
+        pos += dur + breakMin;
+      }
+      if(remaining <= 0) break;
+    }
+    cursorDate = addDays(cursorDate, 1);
+  }
+  task.blocks = blocks;
+  task.unscheduledMinutes = remaining;
+}
+
+function rescheduleAll(){
+  const pending = TASKS.filter(t=>!t.done).sort((a,b)=> new Date(a.deadline) - new Date(b.deadline));
+  for(const t of pending) scheduleTask(t);
+}
+
+/* ============ RENDER ROOT ============ */
+function el(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
+
+async function init(){
+  CONFIG = await loadState('config', null);
+  TASKS = await loadState('tasks', []);
+  route = CONFIG ? 'today' : 'onboarding';
+  render();
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  if(route === 'loading'){ return; }
+  if(route === 'onboarding'){ app.appendChild(renderOnboarding()); return; }
+
+  app.appendChild(renderTopbar());
+  if(route === 'today') app.appendChild(renderToday());
+  if(route === 'tasks') app.appendChild(renderTasks());
+  if(route === 'config') app.appendChild(renderConfig());
+  app.appendChild(renderNav());
+
+  if(route === 'tasks'){
+    const fab = el(`<button class="fab" aria-label="Agregar tarea">+</button>`);
+    fab.onclick = () => { taskDraft = {name:'', hours:'', minutes:'', deadline:''}; openModal('addTask'); };
+    app.appendChild(fab);
+  }
+
+  if(modalOpen) app.appendChild(renderModal());
+}
+
+/* ============ TOPBAR / NAV ============ */
+function renderTopbar(){
+  const today = new Date();
+  const label = today.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'});
+  return el(`
+    <div class="topbar">
+      <div class="brand"><div class="brand-mark"></div><div class="brand-name">Mosaico</div></div>
+      <div class="today-pill">${label}</div>
+    </div>`);
+}
+
+function renderNav(){
+  const items = [
+    {id:'today', ic:'◧', label:'Hoy'},
+    {id:'tasks', ic:'✎', label:'Tareas'},
+    {id:'config', ic:'⚙', label:'Config'},
+  ];
+  const bar = el(`<div class="navbar"><div class="navbar-inner"></div></div>`);
+  const inner = bar.querySelector('.navbar-inner');
+  for(const it of items){
+    const b = el(`<button class="nav-btn ${route===it.id?'active':''}"><span class="ic">${it.ic}</span>${it.label}</button>`);
+    b.onclick = () => { route = it.id; render(); };
+    inner.appendChild(b);
+  }
+  return bar;
+}
+
+/* ============ ONBOARDING ============ */
+function renderOnboarding(){
+  const steps = ['sueño','trabajo','otras','foco'];
+  const wrap = el(`<div class="screen" style="padding-top:34px;"></div>`);
+  const prog = el(`<div class="ob-progress"></div>`);
+  steps.forEach((s,i)=> prog.appendChild(el(`<div class="${i<=obStep?'done':''}"></div>`)));
+  wrap.appendChild(prog);
+
+  if(obStep === 0){
+    wrap.appendChild(el(`<div class="ob-hero">🌙</div>`));
+    wrap.appendChild(el(`<h1 class="ob-title">Empecemos por tu descanso</h1>`));
+    wrap.appendChild(el(`<p class="ob-sub">Así nunca te voy a proponer tareas en tu horario de sueño.</p>`));
+    const row = el(`<div class="row2"></div>`);
+    const f1 = el(`<label class="field"><span>Te acostás</span></label>`);
+    const i1 = el(`<input type="time" value="${obDraft.sleepStart}">`);
+    i1.oninput = e => obDraft.sleepStart = e.target.value;
+    f1.appendChild(i1);
+    const f2 = el(`<label class="field"><span>Te levantás</span></label>`);
+    const i2 = el(`<input type="time" value="${obDraft.sleepEnd}">`);
+    i2.oninput = e => obDraft.sleepEnd = e.target.value;
+    f2.appendChild(i2);
+    row.appendChild(f1); row.appendChild(f2);
+    wrap.appendChild(row);
+  }
+
+  if(obStep === 1){
+    wrap.appendChild(el(`<div class="ob-hero">💼</div>`));
+    wrap.appendChild(el(`<h1 class="ob-title">¿Y tu trabajo?</h1>`));
+    wrap.appendChild(el(`<p class="ob-sub">Marcá los días y el horario. Si no tenés un horario fijo, dejá los días sin marcar.</p>`));
+    const dots = el(`<div class="daydots"></div>`);
+    DAY_LABELS.forEach((lb,i)=>{
+      const on = obDraft.workDays.includes(i);
+      const c = el(`<button class="daychip ${on?'on':''}">${lb}</button>`);
+      c.onclick = () => { obDraft.workDays = obDraft.workDays.includes(i) ? obDraft.workDays.filter(x=>x!==i) : [...obDraft.workDays,i]; render(); };
+      dots.appendChild(c);
+    });
+    wrap.appendChild(dots);
+    const row = el(`<div class="row2"></div>`);
+    const f1 = el(`<label class="field"><span>Entrás</span></label>`);
+    const i1 = el(`<input type="time" value="${obDraft.workStart}">`);
+    i1.oninput = e => obDraft.workStart = e.target.value;
+    f1.appendChild(i1);
+    const f2 = el(`<label class="field"><span>Salís</span></label>`);
+    const i2 = el(`<input type="time" value="${obDraft.workEnd}">`);
+    i2.oninput = e => obDraft.workEnd = e.target.value;
+    f2.appendChild(i2);
+    row.appendChild(f1); row.appendChild(f2);
+    wrap.appendChild(row);
+  }
+
+  if(obStep === 2){
+    wrap.appendChild(el(`<div class="ob-hero">🗓️</div>`));
+    wrap.appendChild(el(`<h1 class="ob-title">Otras actividades fijas</h1>`));
+    wrap.appendChild(el(`<p class="ob-sub">Gimnasio, facultad, terapia... lo que ya te ocupa horario. Podés agregar varias, o saltear este paso.</p>`));
+    for(let idx=0; idx<obDraft.others.length; idx++){
+      const o = obDraft.others[idx];
+      const days = o.days.map(d=>DAY_LABELS[d]).join(' ');
+      const item = el(`<div class="other-item"><div><div class="ot-name">${o.name}</div><div class="ot-meta">${days} · ${o.start}–${o.end}</div></div></div>`);
+      const del = el(`<button class="icon-btn">✕</button>`);
+      del.onclick = () => { obDraft.others.splice(idx,1); render(); };
+      item.appendChild(del);
+      wrap.appendChild(item);
+    }
+    const addBtn = el(`<button class="btn btn-ghost" style="margin-top:6px;">+ Agregar actividad</button>`);
+    addBtn.onclick = () => { otherDraft = {name:'', days:[], start:'09:00', end:'10:00'}; openModal('addOther'); };
+    wrap.appendChild(addBtn);
+  }
+
+  if(obStep === 3){
+    wrap.appendChild(el(`<div class="ob-hero">🎯</div>`));
+    wrap.appendChild(el(`<h1 class="ob-title">¿Cuánto podés concentrarte de una?</h1>`));
+    wrap.appendChild(el(`<p class="ob-sub">Voy a partir tus tareas en módulos de este tamaño, con descansos cortos entre medio.</p>`));
+    const st = el(`<div class="stepper"></div>`);
+    const minus = el(`<button>−</button>`);
+    minus.onclick = () => { obDraft.focusMinutes = Math.max(10, obDraft.focusMinutes-5); render(); };
+    const val = el(`<div class="val">${obDraft.focusMinutes}</div>`);
+    const plus = el(`<button>+</button>`);
+    plus.onclick = () => { obDraft.focusMinutes = Math.min(120, obDraft.focusMinutes+5); render(); };
+    st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
+    wrap.appendChild(st);
+    wrap.appendChild(el(`<div class="unit">minutos por módulo</div>`));
+  }
+
+  const nav = el(`<div style="display:flex; gap:10px; margin-top:30px;"></div>`);
+  if(obStep > 0){
+    const back = el(`<button class="btn btn-ghost">Atrás</button>`);
+    back.onclick = () => { obStep--; render(); };
+    nav.appendChild(back);
+  }
+  const next = el(`<button class="btn btn-primary">${obStep===3 ? 'Empezar':'Continuar'}</button>`);
+  next.onclick = () => {
+    if(obStep < 3){ obStep++; render(); }
+    else finishOnboarding();
+  };
+  nav.appendChild(next);
+  wrap.appendChild(nav);
+  return wrap;
+}
+
+async function finishOnboarding(){
+  CONFIG = { ...obDraft };
+  await saveState('config', CONFIG);
+  route = 'today';
+  render();
+}
+
+/* ============ MODALS ============ */
+function openModal(name){ modalOpen = name; render(); }
+function closeModal(){ modalOpen = null; render(); }
+
+function renderModal(){
+  const backdrop = el(`<div class="modal-backdrop"></div>`);
+  backdrop.onclick = (e) => { if(e.target === backdrop) closeModal(); };
+  const sheet = el(`<div class="modal-sheet"><div class="sheet-handle"></div></div>`);
+
+  if(modalOpen === 'addOther'){
+    sheet.appendChild(el(`<h3 style="margin:0 0 14px;">Nueva actividad</h3>`));
+    const f1 = el(`<label class="field"><span>Nombre</span></label>`);
+    const i1 = el(`<input type="text" placeholder="Ej: Gimnasio" value="${otherDraft.name}">`);
+    i1.oninput = e => otherDraft.name = e.target.value;
+    f1.appendChild(i1); sheet.appendChild(f1);
+
+    sheet.appendChild(el(`<label class="field"><span>Días</span></label>`));
+    const dots = el(`<div class="daydots"></div>`);
+    DAY_LABELS.forEach((lb,i)=>{
+      const on = otherDraft.days.includes(i);
+      const c = el(`<button class="daychip ${on?'on':''}">${lb}</button>`);
+      c.onclick = () => { otherDraft.days = otherDraft.days.includes(i) ? otherDraft.days.filter(x=>x!==i) : [...otherDraft.days,i]; render(); };
+      dots.appendChild(c);
+    });
+    sheet.appendChild(dots);
+
+    const row = el(`<div class="row2"></div>`);
+    const f2 = el(`<label class="field"><span>Desde</span></label>`);
+    const i2 = el(`<input type="time" value="${otherDraft.start}">`);
+    i2.oninput = e => otherDraft.start = e.target.value;
+    f2.appendChild(i2);
+    const f3 = el(`<label class="field"><span>Hasta</span></label>`);
+    const i3 = el(`<input type="time" value="${otherDraft.end}">`);
+    i3.oninput = e => otherDraft.end = e.target.value;
+    f3.appendChild(i3);
+    row.appendChild(f2); row.appendChild(f3);
+    sheet.appendChild(row);
+
+    const save = el(`<button class="btn btn-primary">Guardar actividad</button>`);
+    save.onclick = () => {
+      if(!otherDraft.name.trim() || otherDraft.days.length===0 || !otherDraft.start || !otherDraft.end){ return; }
+      obDraft.others.push({...otherDraft});
+      closeModal(); obStep = 2; render();
+    };
+    sheet.appendChild(save);
+  }
+
+  if(modalOpen === 'addTask'){
+    sheet.appendChild(el(`<h3 style="margin:0 0 14px;">Nueva tarea</h3>`));
+    const f1 = el(`<label class="field"><span>¿Qué tenés que hacer?</span></label>`);
+    const i1 = el(`<input type="text" placeholder="Ej: Terminar informe">`);
+    i1.oninput = e => taskDraft.name = e.target.value;
+    f1.appendChild(i1); sheet.appendChild(f1);
+
+    sheet.appendChild(el(`<label class="field"><span>¿Cuánto tiempo te va a llevar en total?</span></label>`));
+    const row = el(`<div class="row2"></div>`);
+    const f2 = el(`<label class="field"><span>Horas</span></label>`);
+    const i2 = el(`<input type="number" min="0" placeholder="0">`);
+    i2.oninput = e => taskDraft.hours = e.target.value;
+    f2.appendChild(i2);
+    const f3 = el(`<label class="field"><span>Minutos</span></label>`);
+    const i3 = el(`<input type="number" min="0" max="59" placeholder="0">`);
+    i3.oninput = e => taskDraft.minutes = e.target.value;
+    f3.appendChild(i3);
+    row.appendChild(f2); row.appendChild(f3);
+    sheet.appendChild(row);
+
+    const f4 = el(`<label class="field"><span>Fecha límite</span></label>`);
+    const i4 = el(`<input type="date" min="${fmtDate(new Date())}">`);
+    i4.oninput = e => taskDraft.deadline = e.target.value;
+    f4.appendChild(i4); sheet.appendChild(f4);
+
+    sheet.appendChild(el(`<p class="muted" style="margin:-4px 0 16px;">La voy a partir en módulos de ${CONFIG.focusMinutes} min y buscar huecos libres entre hoy y esa fecha.</p>`));
+
+    const save = el(`<button class="btn btn-primary">Organizar tarea</button>`);
+    save.onclick = async () => {
+      const hrs = parseInt(taskDraft.hours||'0',10) || 0;
+      const mins = parseInt(taskDraft.minutes||'0',10) || 0;
+      const total = hrs*60+mins;
+      if(!taskDraft.name.trim() || total<=0 || !taskDraft.deadline) return;
+      const task = { id: 't'+Date.now(), name: taskDraft.name.trim(), totalMinutes: total, deadline: taskDraft.deadline, blocks:[], done:false };
+      TASKS.push(task);
+      rescheduleAll();
+      await saveState('tasks', TASKS);
+      closeModal(); route='tasks'; render();
+    };
+    sheet.appendChild(save);
+  }
+
+  backdrop.appendChild(sheet);
+  return backdrop;
+}
+
+/* ============ TODAY SCREEN ============ */
+function renderToday(){
+  const wrap = el(`<div class="screen"></div>`);
+  const now = new Date();
+  wrap.appendChild(el(`<div class="now-row"><div class="now-dot"></div><div class="now-text">Ahora son las ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}</div></div>`));
+
+  const dateStr = fmtDate(now);
+  const fixed = fixedBlocksForDate(now).map(b=>({...b, kind:'fixed'}));
+  const taskBlocks = [];
+  for(const t of TASKS){
+    for(let bi=0; bi<t.blocks.length; bi++){
+      const b = t.blocks[bi];
+      if(b.date === dateStr){ taskBlocks.push({start:toMin(b.start), end:toMin(b.end), label:t.name, kind:'task', taskId:t.id, blockIndex:bi, done:b.done}); }
+    }
+  }
+  const all = [...fixed, ...taskBlocks].sort((a,b)=>a.start-b.start);
+
+  if(all.length === 0){
+    wrap.appendChild(el(`<div class="empty-state"><div class="ic">🌤️</div><div class="muted">Nada agendado por ahora.<br>Agregá tareas para armar el mosaico.</div></div>`));
+  } else {
+    for(const item of all){
+      const color = item.kind==='fixed' ? `var(--${item.cat})` : taskColor(item.taskId);
+      const bEl = el(`
+        <div class="block ${item.done?'done':''}" style="--bar:${color}">
+          <div class="block-time">${toHHMM(item.start)}<br><span style="color:var(--text-faint);font-weight:500;">${toHHMM(item.end)}</span></div>
+          <div class="block-main">
+            <div class="block-name">${item.label}</div>
+            <div class="block-tag">${item.kind==='fixed' ? 'Bloque fijo' : 'Módulo de foco'}</div>
+          </div>
+        </div>`);
+      wrap.appendChild(bEl);
+    }
+  }
+  return wrap;
+}
+
+/* ============ TASKS SCREEN ============ */
+function renderTasks(){
+  const wrap = el(`<div class="screen"></div>`);
+  if(TASKS.length === 0){
+    wrap.appendChild(el(`<div class="empty-state"><div class="ic">📝</div><div class="muted">No tenés tareas pendientes.<br>Tocá el botón + para sumar una.</div></div>`));
+    return wrap;
+  }
+  for(const t of TASKS){
+    const doneMinutes = t.blocks.filter(b=>b.done).length * CONFIG.focusMinutes;
+    const pct = Math.min(100, Math.round((doneMinutes / t.totalMinutes) * 100));
+    const color = taskColor(t.id);
+    const card = el(`
+      <div class="task-card">
+        <div class="task-top">
+          <div>
+            <div class="task-name">${t.name}</div>
+            <div class="task-deadline">Límite: ${t.deadline}</div>
+          </div>
+          <button class="btn btn-danger btn-sm">Eliminar</button>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%; background:${color}"></div></div>
+        <div class="task-meta-row"><span>${doneMinutes}/${t.totalMinutes} min</span><span>${pct}%</span></div>
+      </div>`);
+    card.querySelector('.btn-danger').onclick = async () => {
+      TASKS = TASKS.filter(x=>x.id!==t.id);
+      rescheduleAll();
+      await saveState('tasks', TASKS);
+      render();
+    };
+    wrap.appendChild(card);
+  }
+  return wrap;
+}
+
+/* ============ CONFIG SCREEN ============ */
+function renderConfig(){
+  const wrap = el(`<div class="screen"></div>`);
+  wrap.appendChild(el(`<h2 class="ob-title">Configuración</h2>`));
+  wrap.appendChild(el(`<p class="ob-sub">Ajustá tu rutina principal</p>`));
+  
+  const resetBtn = el(`<button class="btn btn-danger" style="margin-top:20px;">Reiniciar configuración</button>`);
+  resetBtn.onclick = async () => {
+    localStorage.clear();
+    CONFIG = null; TASKS = []; route = 'onboarding'; obStep = 0;
+    render();
+  };
+  wrap.appendChild(resetBtn);
+  return wrap;
+}
+
+// Inicializar la app al cargar la página
+window.onload = init;
+</script>
+</body>
 </html>
