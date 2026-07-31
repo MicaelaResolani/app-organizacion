@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizador Personal & Control de Sueño</title>
+  <title>Organizador Personal & Dashboard de Enfoque</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -48,9 +48,15 @@
 
     header {
       display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 10px 0;
+    }
+
+    .header-top {
+      display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
     }
 
     .title-area h1 {
@@ -63,6 +69,37 @@
       color: var(--text-muted);
       font-size: 14px;
       margin-top: 2px;
+    }
+
+    /* BANNER MOTIVACIONAL */
+    .quote-banner {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px dashed var(--accent);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .quote-banner:hover {
+      background: rgba(99, 102, 241, 0.18);
+    }
+
+    .quote-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      font-style: italic;
+    }
+
+    .quote-refresh {
+      font-size: 14px;
+      color: var(--accent);
+      user-select: none;
     }
 
     /* PANELES Y TARJETAS */
@@ -89,6 +126,61 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    /* MÓDULO DE RESCATE DEL DÍA (BAJO FOCO) */
+    .rescue-card {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(30, 41, 59, 1) 100%);
+      border: 1px solid #f59e0b;
+    }
+
+    .rescue-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rescue-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .rescue-input-row input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .btn-rescue {
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .rescue-active-display {
+      background: var(--bg);
+      border: 1px solid #f59e0b;
+      padding: 14px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rescue-active-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fbbf24;
     }
 
     /* METRICAS DE DASHBOARD */
@@ -132,7 +224,7 @@
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* SECCIÓN COMPLETA DE SUEÑO */
+    /* SECCIÓN DE SUEÑO */
     .sleep-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -192,7 +284,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 220px;
+      max-height: 180px;
       overflow-y: auto;
     }
 
@@ -207,13 +299,7 @@
       font-size: 13px;
     }
 
-    .sleep-item-info {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    /* CONTROLES Y FILTROS */
+    /* CONTROLES Y TAREAS */
     .controls-row {
       display: flex;
       justify-content: space-between;
@@ -264,7 +350,6 @@
 
     .add-btn:hover { background: var(--accent-hover); }
 
-    /* LISTA TAREAS */
     .task-list {
       display: flex;
       flex-direction: column;
@@ -355,7 +440,7 @@
 
     .delete-btn:hover { color: var(--danger); }
 
-    /* SECCIÓN CONFIGURACIÓN DE COLORES LIBRE */
+    /* SECCIÓN CONFIGURACIÓN COLORES LIBRE */
     .config-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -459,11 +544,31 @@
 
   <div class="app-container">
     <header>
-      <div class="title-area">
-        <h1>Mi Espacio Personal</h1>
-        <p>Tareas, métricas de descanso y personalización libre</p>
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Mi Espacio Personal</h1>
+          <p>Gestión de tareas, foco y descanso</p>
+        </div>
+      </div>
+
+      <!-- BANNER MOTIVACIONAL INTERACTIVO -->
+      <div class="quote-banner" onclick="nextQuote()" title="Haz clic para cambiar la frase">
+        <span class="quote-text" id="quote-display">"Un paso de 5 minutos sigue siendo progreso."</span>
+        <span class="quote-refresh">🔄</span>
       </div>
     </header>
+
+    <!-- MÓDULO DE RESCATE DEL DÍA (PARA DÍAS DE DISPERSIÓN O POCO FOCO) -->
+    <div class="panel-card rescue-card">
+      <div class="panel-header">
+        <div class="panel-title" style="color: #f59e0b;">🛡️ Rescate del Día (Modo Bajo Foco)</div>
+        <span style="font-size: 11px; color: var(--text-muted);">Si te cuesta concentrarte, hacé solo esto.</span>
+      </div>
+      
+      <div class="rescue-box" id="rescue-box">
+        <!-- Render dinámico desde JS -->
+      </div>
+    </div>
 
     <!-- DASHBOARD DE TAREAS -->
     <div class="panel-card">
@@ -486,10 +591,9 @@
     <div class="panel-card">
       <div class="panel-header">
         <div class="panel-title">🌙 Monitor de Descanso y Sueño</div>
-        <span style="font-size: 12px; color: var(--text-muted);" id="target-display">Meta: 8.0 hs</span>
+        <span style="font-size: 12px; color: var(--text-muted);">Meta: 8.0 hs</span>
       </div>
 
-      <!-- Formularios de Carga de Sueño -->
       <div class="sleep-grid">
         <div class="sleep-field">
           <label for="sleep-date">Fecha</label>
@@ -500,7 +604,7 @@
           <input type="number" id="sleep-hours" min="0" max="24" step="0.5" placeholder="Ej: 7.5">
         </div>
         <div class="sleep-field">
-          <label for="sleep-quality">Calidad del Sueño</label>
+          <label for="sleep-quality">Calidad</label>
           <select id="sleep-quality">
             <option value="Excelente">😴 Excelente</option>
             <option value="Buena" selected>😊 Buena</option>
@@ -513,7 +617,6 @@
         </div>
       </div>
 
-      <!-- Resumen Estadístico de Sueño -->
       <div class="sleep-stats-row">
         <div class="sleep-stat-item">
           <span class="sleep-stat-val" id="stat-avg">0 hs</span>
@@ -529,11 +632,8 @@
         </div>
       </div>
 
-      <!-- Historial Diario de Sueño -->
       <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-top: 4px;">Historial de Noches:</div>
-      <div class="sleep-history-list" id="sleep-history-list">
-        <!-- Carga dinámica -->
-      </div>
+      <div class="sleep-history-list" id="sleep-history-list"></div>
     </div>
 
     <!-- CONTROLES Y LISTA DE TAREAS -->
@@ -548,10 +648,10 @@
 
     <div class="task-list" id="task-list"></div>
 
-    <!-- CONFIGURACIÓN DE COLORES TOTALMENTE LIBRE -->
+    <!-- CONFIGURACIÓN LIBRE DE COLORES -->
     <div class="panel-card">
       <div class="panel-title">🎨 Configuración Personalizada de Colores</div>
-      <p style="font-size: 13px; color: var(--text-muted);">Hacé clic en cualquier círculo para cambiar el color con la paleta de tu navegador:</p>
+      <p style="font-size: 13px; color: var(--text-muted);">Elegí los colores a tu gusto:</p>
       
       <div class="config-grid">
         <div class="color-picker-item">
@@ -578,7 +678,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE NUEVA TAREA -->
+  <!-- MODAL NUEVA TAREA -->
   <div class="modal-backdrop hidden" id="modal">
     <div class="modal-card">
       <h2>Agregar nuevo pendiente</h2>
@@ -607,7 +707,63 @@
   </div>
 
   <script>
-    // ESTADO DE TAREAS
+    // 1. SISTEMA DE FRASES MOTIVACIONALES Y DE FOCO
+    const quotes = [
+      "\"Un paso de 5 minutos sigue siendo progreso real.\"",
+      "\"No necesitás motivación constante, necesitás una sola micro-acción.\"",
+      "\"Senior mindset: Primero que funcione, después que sea elegante, siempre entendible.\"",
+      "\"Si hoy tenés poco foco, rescatá el día con 1 sola victoria simple.\"",
+      "\"La consistencia vence al talento desorganizado todos los días.\"",
+      "\"Reducí la fricción: hacé la tarea tan pequeña que sea imposible fallar.\""
+    ];
+    let currentQuoteIndex = 0;
+
+    function nextQuote() {
+      currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+      document.getElementById('quote-display').innerText = quotes[currentQuoteIndex];
+    }
+
+    // 2. SISTEMA DE RESCATE DEL DÍA (1 TAREA DE BAJO FOCO)
+    let rescueTask = localStorage.getItem('organizador_rescate') || '';
+
+    function renderRescue() {
+      const box = document.getElementById('rescue-box');
+      if (rescueTask) {
+        box.innerHTML = `
+          <div class="rescue-active-display">
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">🎯 TU MISION DE RESCATE DE HOY:</span>
+              <span class="rescue-active-text">${rescueTask}</span>
+            </div>
+            <button class="btn-rescue" onclick="completeRescue()">¡Completado! ✨</button>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="rescue-input-row">
+            <input type="text" id="rescue-input" placeholder="Escribí UNA sola cosa mini para salvar hoy (Ej: Ordenar 1 archivo)">
+            <button class="btn-rescue" onclick="setRescue()">Fijar Foco</button>
+          </div>
+        `;
+      }
+    }
+
+    function setRescue() {
+      const val = document.getElementById('rescue-input').value.trim();
+      if (!val) return;
+      rescueTask = val;
+      localStorage.setItem('organizador_rescate', rescueTask);
+      renderRescue();
+    }
+
+    function completeRescue() {
+      alert("¡Día rescatado con éxito! No importa qué tan grande era la lista, cumpliste tu prioridad.");
+      rescueTask = '';
+      localStorage.removeItem('organizador_rescate');
+      renderRescue();
+    }
+
+    // 3. ESTADO DE TAREAS GENERALES
     let tasks = JSON.parse(localStorage.getItem('organizador_tareas')) || [
       { id: 1, title: 'Diseñar interfaz del Dashboard', category: 'programacion', date: '2026-08-05', completed: true },
       { id: 2, title: 'Organizar documentación administrativa', category: 'admin', date: '2026-08-10', completed: false }
@@ -615,13 +771,13 @@
 
     let currentFilter = 'all';
 
-    // ESTADO DE SUEÑO (HISTORIAL DIARIO)
+    // 4. ESTADO DE SUEÑO
     let sleepRecords = JSON.parse(localStorage.getItem('organizador_sueño_historial')) || [
       { id: 1, date: '2026-07-29', hours: 7.5, quality: 'Buena' },
       { id: 2, date: '2026-07-28', hours: 8.0, quality: 'Excelente' }
     ];
 
-    // MANEJO LIBRE DE COLORES
+    // 5. MANEJO LIBRE DE COLORES
     const customColors = JSON.parse(localStorage.getItem('organizador_colores_custom')) || {};
 
     function updateColor(variableCss, value) {
@@ -642,7 +798,7 @@
       });
     }
 
-    // OPERACIONES DE SUEÑO
+    // LÓGICA SUEÑO
     function addSleepRecord() {
       const date = document.getElementById('sleep-date').value;
       const hours = parseFloat(document.getElementById('sleep-hours').value);
@@ -650,14 +806,7 @@
 
       if (!date || isNaN(hours) || hours <= 0) return;
 
-      const newRecord = {
-        id: Date.now(),
-        date,
-        hours,
-        quality
-      };
-
-      sleepRecords.unshift(newRecord);
+      sleepRecords.unshift({ id: Date.now(), date, hours, quality });
       localStorage.setItem('organizador_sueño_historial', JSON.stringify(sleepRecords));
       
       document.getElementById('sleep-hours').value = '';
@@ -682,7 +831,6 @@
         return;
       }
 
-      // Cálculos estadísticos
       const totalHours = sleepRecords.reduce((sum, r) => sum + r.hours, 0);
       const avg = (totalHours / sleepRecords.length).toFixed(1);
       const last = sleepRecords[0].hours;
@@ -691,24 +839,22 @@
       document.getElementById('stat-last').innerText = `${last} hs`;
       document.getElementById('stat-count').innerText = sleepRecords.length;
 
-      // Renderizar historial
       sleepRecords.forEach(rec => {
         const item = document.createElement('div');
         item.className = 'sleep-history-item';
         
         item.innerHTML = `
-          <div class="sleep-item-info">
-            <strong>📅 ${rec.date}</strong>
-            <span><strong>${rec.hours} hrs</strong> (${rec.quality})</span>
+          <div>
+            <strong>📅 ${rec.date}</strong> — <strong>${rec.hours} hrs</strong> (${rec.quality})
           </div>
-          <button class="delete-btn" onclick="deleteSleepRecord(${rec.id})" title="Eliminar este registro">✕</button>
+          <button class="delete-btn" onclick="deleteSleepRecord(${rec.id})" title="Eliminar">✕</button>
         `;
 
         listEl.appendChild(item);
       });
     }
 
-    // OPERACIONES DE TAREAS
+    // LÓGICA TAREAS
     function saveTasks() {
       localStorage.setItem('organizador_tareas', JSON.stringify(tasks));
       renderTasks();
@@ -800,6 +946,7 @@
     // INICIALIZACIÓN
     document.getElementById('sleep-date').valueAsDate = new Date();
     loadCustomColors();
+    renderRescue();
     renderSleep();
     renderTasks();
   </script>
